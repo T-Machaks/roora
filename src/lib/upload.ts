@@ -50,9 +50,10 @@ export async function saveUpload(file: File): Promise<SavedUpload> {
   const fileName = `${randomUUID()}.${sniffed.ext}`;
   const relativePath = path.posix.join(year, fileName);
 
-  const absoluteDir = path.join(uploadDir(), year);
+  const dir = uploadDir();
+  const absoluteDir = path.join(/* turbopackIgnore: true */ dir, year);
   await mkdir(absoluteDir, { recursive: true });
-  await writeFile(path.join(uploadDir(), year, fileName), buffer);
+  await writeFile(path.join(/* turbopackIgnore: true */ dir, year, fileName), buffer);
 
   return {
     fileName,

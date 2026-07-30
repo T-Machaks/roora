@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { UploadForm } from "./upload-form";
@@ -51,12 +52,12 @@ export default async function GalleryPage() {
           </h2>
           <div className="grid grid-cols-3 gap-2">
             {mine.map((m) => (
-              <div key={m.id} className="flex flex-col gap-1">
+              <Link key={m.id} href={`/gallery/${m.id}`} className="flex flex-col gap-1">
                 <div className="aspect-square overflow-hidden rounded-lg border border-border">
                   <Thumb id={m.id} type={m.type} />
                 </div>
                 <p className="text-[10px] text-ink-muted">{STATUS_LABEL[m.status]}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -73,9 +74,13 @@ export default async function GalleryPage() {
         ) : (
           <div className="grid grid-cols-3 gap-2">
             {approved.map((m) => (
-              <div key={m.id} className="aspect-square overflow-hidden rounded-lg border border-border">
+              <Link
+                key={m.id}
+                href={`/gallery/${m.id}`}
+                className="aspect-square overflow-hidden rounded-lg border border-border"
+              >
                 <Thumb id={m.id} type={m.type} />
-              </div>
+              </Link>
             ))}
           </div>
         )}
