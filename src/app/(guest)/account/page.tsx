@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { PasswordForm } from "./password-form";
+import { PushSubscribeButton } from "@/components/push-subscribe-button";
 
 export const metadata = { title: "Account" };
 
@@ -23,6 +24,13 @@ export default async function AccountPage() {
         <p className="mt-1 text-xs uppercase tracking-wide text-ink-muted">
           {user.role.replaceAll("_", " ")}
         </p>
+      </section>
+
+      <section>
+        <h2 className="font-display text-lg text-primary">Notifications</h2>
+        <div className="mt-3">
+          <PushSubscribeButton />
+        </div>
       </section>
 
       <section>
