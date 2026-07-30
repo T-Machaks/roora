@@ -87,7 +87,6 @@ export default async function RootLayout({
         {/* Runtime theme override: a superadmin editing colors at
             /admin/settings takes effect immediately, no redeploy. */}
         <style
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: `:root{--primary:${theme.primary};--secondary:${theme.secondary};}`,
           }}

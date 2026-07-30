@@ -29,15 +29,18 @@ export function InstallPrompt() {
   const [showIOSHint, setShowIOSHint] = useState(false);
 
   useEffect(() => {
-    if (isStandalone()) return;
-    if (localStorage.getItem(DISMISSED_KEY)) return;
+    if (isStandalone() || localStorage.getItem(DISMISSED_KEY)) return;
 
     if (isIOS()) {
       // iOS Safari has no beforeinstallprompt — "Add to Home Screen" is
       // only reachable via the Share sheet, so we can only point at it.
-      setShowIOSHint(true);
-      setVisible(true);
-      return;
+      // Deferred a tick so this doesn't setState synchronously during
+      // the effect's own commit.
+      const timer = setTimeout(() => {
+        setShowIOSHint(true);
+        setVisible(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     function handleBeforeInstallPrompt(e: Event) {

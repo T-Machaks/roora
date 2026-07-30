@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { saveScheduleItem, deleteScheduleItem } from "@/lib/actions/schedule";
 import { toWallClockInputValue } from "@/lib/format";
 import { Button } from "@/components/ui/button";
-import { Input, Label } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 
 export const metadata = { title: "Schedule" };
 

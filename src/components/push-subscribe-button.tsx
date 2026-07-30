@@ -13,25 +13,41 @@ function urlBase64ToUint8Array(base64String: string) {
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const PUSH_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PUSH === "true";
 
+type Status = "idle" | "checking" | "subscribed" | "unsupported" | "denied";
+
+// Doesn't touch window/navigator, so it's safe to compute up front — this
+// keeps the "feature flag off" case out of the effect entirely.
+function initialStatus(): Status {
+  return !PUSH_ENABLED || !VAPID_PUBLIC_KEY ? "unsupported" : "checking";
+}
+
 export function PushSubscribeButton() {
-  const [status, setStatus] = useState<
-    "idle" | "checking" | "subscribed" | "unsupported" | "denied"
-  >("checking");
+  const [status, setStatus] = useState<Status>(initialStatus);
 
   useEffect(() => {
-    if (!PUSH_ENABLED || !VAPID_PUBLIC_KEY) {
-      setStatus("unsupported");
-      return;
+    if (status !== "checking") return;
+
+    let active = true;
+
+    async function checkExistingSubscription() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        if (active) setStatus("unsupported");
+        return;
+      }
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (active) setStatus(sub ? "subscribed" : "idle");
+      } catch {
+        if (active) setStatus("idle");
+      }
     }
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setStatus("unsupported");
-      return;
-    }
-    navigator.serviceWorker.ready
-      .then((reg) => reg.pushManager.getSubscription())
-      .then((sub) => setStatus(sub ? "subscribed" : "idle"))
-      .catch(() => setStatus("idle"));
-  }, []);
+
+    checkExistingSubscription();
+    return () => {
+      active = false;
+    };
+  }, [status]);
 
   async function handleEnable() {
     const permission = await Notification.requestPermission();
