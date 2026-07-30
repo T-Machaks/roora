@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { Cormorant_Garamond } from "next/font/google";
+import { db } from "@/lib/db";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,6 +28,13 @@ export const metadata: Metadata = {
     follow: false,
   },
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -39,17 +48,55 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+
+async function getThemeColors() {
+  const fallback = { primary: "#5C3A21", secondary: "#EDE0D4" };
+  try {
+    const settings = await db.eventSettings.findUnique({ where: { id: "default" } });
+    if (!settings) return fallback;
+    return {
+      primary: HEX_COLOR.test(settings.themePrimaryColor)
+        ? settings.themePrimaryColor
+        : fallback.primary,
+      secondary: HEX_COLOR.test(settings.themeSecondaryColor)
+        ? settings.themeSecondaryColor
+        : fallback.secondary,
+    };
+  } catch {
+    // DB not seeded/reachable yet (e.g. first boot before `npm run seed`) —
+    // fall back to the default groom palette rather than crashing the app.
+    return fallback;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const theme = await getThemeColors();
+
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* Runtime theme override: a superadmin editing colors at
+            /admin/settings takes effect immediately, no redeploy. */}
+        <style
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `:root{--primary:${theme.primary};--secondary:${theme.secondary};}`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <ServiceWorkerRegister />
+      </body>
     </html>
   );
 }
