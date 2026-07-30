@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/*
+ * Theme tokens.
+ * Defaults below are the groom-side palette (chocolate brown + beige).
+ * At runtime, RootLayout reads the EventSettings row from the database and
+ * injects an inline <style> override for --primary/--secondary, so a
+ * superadmin can change the palette from /admin/settings with no redeploy.
+ * These :root values are only the pre-seed / build-time fallback.
+ */
+:root {
+  --primary: #5c3a21; /* chocolate brown */
+  --primary-dark: #3e2716;
+  --secondary: #ede0d4; /* beige */
+  --background: #fbf7f2; /* warm cream */
+  --surface: #ffffff;
+  --ink: #2a1b12; /* warm near-black for body text */
+  --ink-muted: #6b5a4a;
+  --border: #ddceb9;
+
+  /* Bride-side accent: placeholder until confirmed, used sparingly (e.g.
+     a thin divider or badge) so swapping it later doesn't require a
+     redesign. */
+  --accent-bride: #c9beb2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1c130c;
+    --surface: #241a11;
+    --ink: #f4ece2;
+    --ink-muted: #cbb9a6;
+    --border: #4a3626;
+  }
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-accent-bride: var(--accent-bride);
+
+  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
