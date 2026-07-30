@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
-  output: "standalone",
+  // Not using `output: "standalone"` — the Docker image copies the full
+  // node_modules instead (see Dockerfile) so the Prisma CLI is available
+  // at container-start time for migrations/seeding, which standalone's
+  // server-runtime-only trace deliberately excludes.
   async headers() {
     return [
       {
