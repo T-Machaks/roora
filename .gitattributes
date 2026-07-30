@@ -1,0 +1,6 @@
+# Force LF for files that get executed as scripts inside Linux containers —
+# Windows checkouts default to CRLF, which breaks the #!/bin/sh shebang
+# (the kernel looks for an interpreter literally named "/bin/sh\r").
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-entrypoint.sh text eol=lf
