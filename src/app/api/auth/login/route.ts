@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { loginSchema } from "@/lib/validations/auth";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 // bcrypt hash of a random unguessable string; used to keep response timing
 // similar whether or not the identifier matches a real account.
@@ -10,6 +11,14 @@ const DUMMY_HASH =
   "$2a$12$CwTycUXWue0Thq9StjUM0uJ8Uus9UkT/j6JMLdrY6HG8vDHnyf.aC";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!rateLimit(`login:${ip}`, 10, 5 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please wait a few minutes and try again." },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {

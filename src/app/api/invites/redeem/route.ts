@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { redeemSchema } from "@/lib/validations/auth";
 import { generateUniqueGuestHandle } from "@/lib/handle";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 const ERROR_RESPONSES: Record<string, { status: number; error: string }> = {
   INVITE_NOT_FOUND: { status: 404, error: "Invite code not found." },
@@ -16,6 +17,14 @@ const ERROR_RESPONSES: Record<string, { status: number; error: string }> = {
 };
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!rateLimit(`redeem:${ip}`, 10, 15 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please wait a while and try again." },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = redeemSchema.safeParse(body);
   if (!parsed.success) {
