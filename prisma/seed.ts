@@ -82,7 +82,10 @@ async function main() {
   const existingItems = await db.scheduleItem.count();
   if (existingItems === 0) {
     const day = eventDate.toISOString().slice(0, 10);
-    const at = (time: string) => new Date(`${day}T${time}:00`);
+    // Appending Z stores the literal Harare wall-clock time typed here,
+    // matching how the admin UI's datetime-local inputs are parsed
+    // (see parseWallClock in src/lib/format.ts) — no timezone conversion.
+    const at = (time: string) => new Date(`${day}T${time}:00.000Z`);
 
     await db.scheduleItem.createMany({
       data: [
