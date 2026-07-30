@@ -21,21 +21,31 @@ function getSessionPassword() {
   return password;
 }
 
-export const sessionOptions: SessionOptions = {
-  password: getSessionPassword(),
-  cookieName: SESSION_COOKIE_NAME,
-  ttl: SESSION_TTL_SECONDS,
-  cookieOptions: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  },
-};
+/**
+ * Built lazily (not as a module-level constant) so that merely importing
+ * this file — which proxy.ts always does — can't throw during `next
+ * build` in environments where env vars are only available at runtime
+ * (e.g. the Docker builder stage, which deliberately excludes .env from
+ * the build context). The check still runs before any session is
+ * actually read or written.
+ */
+function getSessionOptions(): SessionOptions {
+  return {
+    password: getSessionPassword(),
+    cookieName: SESSION_COOKIE_NAME,
+    ttl: SESSION_TTL_SECONDS,
+    cookieOptions: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    },
+  };
+}
 
 /** For use in Server Components, Route Handlers, and Server Actions. */
 export async function getSession() {
-  return getIronSession<SessionData>(await cookies(), sessionOptions);
+  return getIronSession<SessionData>(await cookies(), getSessionOptions());
 }
 
 /**
@@ -48,9 +58,10 @@ export async function readSessionCookie(
 ): Promise<SessionData | null> {
   if (!cookieValue) return null;
   try {
+    const options = getSessionOptions();
     const data = await unsealData<Partial<SessionData>>(cookieValue, {
-      password: sessionOptions.password,
-      ttl: sessionOptions.ttl,
+      password: options.password,
+      ttl: options.ttl,
     });
     if (!data.userId || !data.role || !data.name) return null;
     return data as SessionData;
