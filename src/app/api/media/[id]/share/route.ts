@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/auth";
 import { Role } from "@/generated/prisma/enums";
 import { generateShareToken } from "@/lib/share";
+import { getRequestBaseUrl } from "@/lib/url";
 
 export async function POST(
   request: Request,
@@ -33,10 +34,9 @@ export async function POST(
     },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   return NextResponse.json({
     ok: true,
-    url: `${baseUrl}/share/${shareLink.token}`,
+    url: `${getRequestBaseUrl(request)}/share/${shareLink.token}`,
     qrUrl: `/api/share/${shareLink.token}/qr`,
   });
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { isShareLinkValid } from "@/lib/share";
+import { getRequestBaseUrl } from "@/lib/url";
 
 export async function GET(
   request: Request,
@@ -13,8 +14,7 @@ export async function GET(
     return NextResponse.json({ error: "This link is no longer valid." }, { status: 404 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const url = `${baseUrl}/share/${token}`;
+  const url = `${getRequestBaseUrl(request)}/share/${token}`;
 
   const buffer = await QRCode.toBuffer(url, {
     type: "png",

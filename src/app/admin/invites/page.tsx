@@ -1,8 +1,19 @@
+import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { createInvite, revokeInvite } from "@/lib/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { CopyButton } from "@/components/ui/copy-button";
+
+// Server Components don't get a raw Request, so this mirrors
+// getRequestBaseUrl (src/lib/url.ts) using next/headers instead.
+async function getBaseUrl() {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto");
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (proto && host) return `${proto}://${host}`;
+  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+}
 
 export const metadata = { title: "Invites" };
 
@@ -18,7 +29,7 @@ export default async function AdminInvitesPage() {
     orderBy: { createdAt: "desc" },
     include: { redeemedBy: { select: { name: true } } },
   });
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = await getBaseUrl();
 
   return (
     <div className="flex flex-col gap-8">

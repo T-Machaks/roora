@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { db } from "@/lib/db";
 import { requireApiRole } from "@/lib/auth";
 import { Role } from "@/generated/prisma/enums";
+import { getRequestBaseUrl } from "@/lib/url";
 
 export async function GET(
   request: Request,
@@ -17,8 +18,7 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const url = `${baseUrl}/redeem/${invitation.token}`;
+  const url = `${getRequestBaseUrl(request)}/redeem/${invitation.token}`;
 
   const buffer = await QRCode.toBuffer(url, {
     type: "png",
