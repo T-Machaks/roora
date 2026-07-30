@@ -1,4 +1,8 @@
-const CACHE_VERSION = "v1";
+// Bump this on any change to this file or PRECACHE_URLS — it's what
+// invalidates old caches in `activate` below. It does NOT gate whether
+// browsers detect the update at all (they diff sw.js by bytes regardless
+// of this string); it only controls old-cache cleanup.
+const CACHE_VERSION = "v2";
 const STATIC_CACHE = `roora-static-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
 
