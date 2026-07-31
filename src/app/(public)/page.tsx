@@ -6,7 +6,7 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-1 flex-col items-center justify-center bg-background px-6 py-16 text-center">
       <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-secondary shadow-md sm:h-40 sm:w-40">
         <Image
-          src="/images/couple/couple-2.jpg"
+          src="/images/couple/couple-2-faces.jpg"
           alt="Blessing and Tessandra"
           fill
           sizes="(min-width: 640px) 10rem, 8rem"
