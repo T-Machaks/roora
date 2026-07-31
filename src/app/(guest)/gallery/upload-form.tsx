@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 export function UploadForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -37,6 +38,7 @@ export function UploadForm() {
       }
       setSuccess(true);
       setCaption("");
+      setFileName(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       router.refresh();
     } finally {
@@ -51,8 +53,19 @@ export function UploadForm() {
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
-        className="text-sm"
+        className="hidden"
+        onChange={(e) => {
+          setError(null);
+          setFileName(e.target.files?.[0]?.name ?? null);
+        }}
       />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        className="rounded-full border border-primary px-6 py-3 text-sm font-medium tracking-wide text-primary transition-colors hover:bg-primary hover:text-secondary"
+      >
+        {fileName ?? "Choose photo or video"}
+      </button>
       <input
         type="text"
         placeholder="Caption (optional)"
@@ -67,7 +80,7 @@ export function UploadForm() {
           Thank you! Your upload is awaiting review before it appears in the gallery.
         </p>
       )}
-      <Button type="submit" disabled={loading} variant="outline">
+      <Button type="submit" disabled={loading} variant="primary">
         {loading ? "Uploading…" : "Upload"}
       </Button>
     </form>
