@@ -8,12 +8,12 @@ services:
     env_file:
       - .env
     environment:
-      # Overrides whatever DATABASE_URL/UPLOAD_DIR are set to in .env —
-      # both must live under the mounted volume so they survive
-      # container recreation, not inside the ephemeral container
-      # filesystem.
+      # Overrides whatever DATABASE_URL is set to in .env — it must live
+      # under the mounted volume so it survives container recreation, not
+      # inside the ephemeral container filesystem. Uploaded media goes to
+      # S3 (S3_BUCKET/AWS_REGION from .env), not this volume, and picks up
+      # credentials from the host's EC2 instance role automatically.
       DATABASE_URL: "file:/app/data/dev.db"
-      UPLOAD_DIR: "/app/data/uploads"
       NODE_ENV: "production"
     volumes:
       - roora_data:/app/data

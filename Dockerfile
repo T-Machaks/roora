@@ -54,10 +54,10 @@ COPY --from=builder --chown=roora:nodejs /app/src/generated ./src/generated
 COPY --chown=roora:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 
-# /app/data is the single volume mount point: the SQLite file lives at
-# /app/data/dev.db and uploads at /app/data/uploads (both set via
-# DATABASE_URL / UPLOAD_DIR in the compose file's environment).
-RUN mkdir -p /app/data/uploads && chown -R roora:nodejs /app/data
+# /app/data is the volume mount point for the SQLite file (path set via
+# DATABASE_URL in the compose file's environment). Uploaded media lives in
+# S3, not on this volume.
+RUN mkdir -p /app/data && chown -R roora:nodejs /app/data
 VOLUME ["/app/data"]
 
 USER roora

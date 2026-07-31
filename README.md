@@ -71,7 +71,7 @@ See `.env.example` for the full list with inline comments. The important ones:
 | --- | --- |
 | `DATABASE_URL` | SQLite file path, e.g. `file:./prisma/dev.db` |
 | `SESSION_SECRET` | 32+ char random string used to encrypt session cookies |
-| `UPLOAD_DIR` | Where uploaded media is stored on disk (outside `/public`) |
+| `S3_BUCKET` / `AWS_REGION` | S3 bucket uploaded media is stored in (private — never public); credentials come from the EC2 instance role in production, or the standard AWS SDK credential chain locally |
 | `MAX_UPLOAD_IMAGE_MB` / `MAX_UPLOAD_VIDEO_MB` | Upload size caps |
 | `NEXT_PUBLIC_BASE_URL` | Used to build absolute invite/share links and QR codes |
 | `SEED_SUPERADMIN_*` | First superadmin account, created by `npm run seed` |
@@ -102,8 +102,9 @@ manual-approval flow; not reachable through the current redeem flow).
 
 ## Media moderation
 
-Guests can upload photos/videos from `/gallery`. Uploads start `PENDING` and are only
-visible to the uploader and staff until a **superadmin** approves them from
+Guests can upload photos/videos from `/gallery`, stored privately in S3 (never a public URL —
+always served back through the app's own authenticated route). Uploads start `PENDING` and
+are only visible to the uploader and staff until a **superadmin** approves them from
 `/admin/moderation` — every approve/reject/hide action is written to an audit log, viewable
 at `/admin/moderation/logs`. Approved memories can be commented on (by any approved guest)
 and shared via a public, unauthenticated link + QR code that works even for people who never
@@ -131,10 +132,21 @@ docker compose up -d --build
 ```
 
 This builds the image, starts the container, and applies any pending Prisma migrations
-automatically on every start (`docker-entrypoint.sh`). The SQLite database and uploaded
-media both live under a named Docker volume (`roora_data`, mounted at `/app/data` inside the
-container) so they survive container recreation — `DATABASE_URL` and `UPLOAD_DIR` are
-overridden inside `docker-compose.yml` to point there regardless of what's in `.env`.
+automatically on every start (`docker-entrypoint.sh`). The SQLite database lives under a
+named Docker volume (`roora_data`, mounted at `/app/data` inside the container) so it
+survives container recreation — `DATABASE_URL` is overridden inside `docker-compose.yml` to
+point there regardless of what's in `.env`. Uploaded media goes straight to S3 (`S3_BUCKET`)
+and never touches local disk, so it isn't part of that volume.
+
+The container picks up S3 credentials from the EC2 instance's IAM role via the AWS SDK's
+default credential chain — no access keys in `.env`. Docker's default bridge network adds a
+hop between the container and the instance metadata service, so the instance's metadata hop
+limit must be raised for the SDK to reach it:
+
+```bash
+aws ec2 modify-instance-metadata-options --instance-id <id> \
+  --http-put-response-hop-limit 2 --http-tokens required --region af-south-1
+```
 
 **First boot only** — seed the superadmin account and event data:
 

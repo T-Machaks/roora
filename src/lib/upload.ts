@@ -1,13 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { fileTypeFromBuffer } from "file-type";
 import {
   ALLOWED_MIME_TYPES,
   ALLOWED_VIDEO_MIME_TYPES,
   maxUploadBytesFor,
-  uploadDir,
 } from "@/lib/constants";
+import { MEDIA_PREFIX, s3Bucket, s3Client } from "@/lib/s3";
 
 export class UploadValidationError extends Error {}
 
@@ -20,10 +19,12 @@ export type SavedUpload = {
 };
 
 /**
- * Validates and persists an uploaded file to local disk. The actual file
- * type is sniffed from its magic bytes — the client-supplied Content-Type
- * and original filename/extension are never trusted, so a renamed
- * executable or script can't slip past the extension check.
+ * Validates and persists an uploaded file to S3. The actual file type is
+ * sniffed from its magic bytes — the client-supplied Content-Type and
+ * original filename/extension are never trusted, so a renamed executable
+ * or script can't slip past the extension check. The object is written
+ * under a private bucket key only; it's never made public, so it's only
+ * reachable through the app's own authenticated/approval-gated routes.
  */
 export async function saveUpload(file: File): Promise<SavedUpload> {
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -48,16 +49,20 @@ export async function saveUpload(file: File): Promise<SavedUpload> {
 
   const year = String(new Date().getFullYear());
   const fileName = `${randomUUID()}.${sniffed.ext}`;
-  const relativePath = path.posix.join(year, fileName);
+  const key = `${MEDIA_PREFIX}/${year}/${fileName}`;
 
-  const dir = uploadDir();
-  const absoluteDir = path.join(/* turbopackIgnore: true */ dir, year);
-  await mkdir(absoluteDir, { recursive: true });
-  await writeFile(path.join(/* turbopackIgnore: true */ dir, year, fileName), buffer);
+  await s3Client().send(
+    new PutObjectCommand({
+      Bucket: s3Bucket(),
+      Key: key,
+      Body: buffer,
+      ContentType: sniffed.mime,
+    })
+  );
 
   return {
     fileName,
-    relativePath,
+    relativePath: key,
     mimeType: sniffed.mime,
     sizeBytes: buffer.byteLength,
     type,
