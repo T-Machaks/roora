@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { PasswordForm } from "./password-form";
 import { PushSubscribeButton } from "@/components/push-subscribe-button";
+import { Button } from "@/components/ui/button";
 
 export const metadata = { title: "Account" };
 
@@ -38,6 +39,14 @@ export default async function AccountPage() {
         <div className="mt-3">
           <PasswordForm />
         </div>
+      </section>
+
+      <section>
+        <form action="/api/auth/logout" method="post">
+          <Button type="submit" variant="outline" className="w-full">
+            Sign out
+          </Button>
+        </form>
       </section>
     </div>
   );
