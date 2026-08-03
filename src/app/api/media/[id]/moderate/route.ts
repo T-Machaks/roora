@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { requireApiRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/enums";
+import { requireApiArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { moderateActionSchema } from "@/lib/validations/media";
 
 const STATUS_FOR_ACTION: Record<string, "APPROVED" | "REJECTED" | "HIDDEN"> = {
@@ -11,14 +11,14 @@ const STATUS_FOR_ACTION: Record<string, "APPROVED" | "REJECTED" | "HIDDEN"> = {
   UNHIDE: "APPROVED",
 };
 
-// Only SUPERADMIN may moderate, even though an ADMIN can reach the
-// moderation page in the UI — this is enforced here independently of
+// SUPERADMIN always may moderate; an ADMIN needs the MODERATION area
+// explicitly granted (see /admin/users) — enforced here independently of
 // whatever the page/proxy already checked.
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireApiRole([Role.SUPERADMIN]);
+  const session = await requireApiArea(AdminArea.MODERATION);
   if (session instanceof NextResponse) return session;
 
   const { id } = await params;

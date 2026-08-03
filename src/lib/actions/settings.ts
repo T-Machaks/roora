@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/enums";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import {
   eventSettingsSchema,
   contactPersonSchema,
@@ -21,7 +21,7 @@ function revalidateSettingsViews() {
 }
 
 export async function updateEventSettings(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.SETTINGS);
 
   const parsed = eventSettingsSchema.safeParse({
     brideName: formData.get("brideName"),
@@ -74,7 +74,7 @@ export async function updateEventSettings(formData: FormData) {
 }
 
 export async function createContact(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.SETTINGS);
 
   const parsed = contactPersonSchema.safeParse({
     name: formData.get("name"),
@@ -102,7 +102,7 @@ export async function createContact(formData: FormData) {
 }
 
 export async function deleteContact(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.SETTINGS);
 
   const id = formData.get("id");
   if (typeof id !== "string" || !id) throw new Error("Missing contact id");

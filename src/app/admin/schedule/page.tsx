@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { saveScheduleItem, deleteScheduleItem } from "@/lib/actions/schedule";
 import { toWallClockInputValue } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -75,6 +77,8 @@ async function getItems(programType: "MAIN" | "AFTER_PARTY") {
 }
 
 export default async function AdminSchedulePage() {
+  await requireArea(AdminArea.SCHEDULE);
+
   const [mainItems, afterItems] = await Promise.all([
     getItems("MAIN"),
     getItems("AFTER_PARTY"),

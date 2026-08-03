@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 
 export const metadata = { title: "RSVPs" };
 
@@ -10,6 +12,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function AdminRsvpsPage() {
+  await requireArea(AdminArea.RSVPS);
+
   const rsvps = await db.rsvp.findMany({
     orderBy: { updatedAt: "desc" },
     include: { user: { select: { name: true, email: true, guestHandle: true } } },

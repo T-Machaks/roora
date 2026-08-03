@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/enums";
+import { requireRole, grantedAreas } from "@/lib/auth";
+import { Role, AdminArea } from "@/generated/prisma/enums";
 import { LogoutIcon } from "@/components/icons";
 
-const NAV = [
+const NAV: { href: string; label: string; area?: AdminArea }[] = [
   { href: "/admin", label: "Overview" },
-  { href: "/admin/invites", label: "Invites" },
-  { href: "/admin/rsvps", label: "RSVPs" },
-  { href: "/admin/schedule", label: "Schedule" },
-  { href: "/admin/moderation", label: "Moderation" },
+  { href: "/admin/invites", label: "Invites", area: AdminArea.INVITES },
+  { href: "/admin/rsvps", label: "RSVPs", area: AdminArea.RSVPS },
+  { href: "/admin/schedule", label: "Schedule", area: AdminArea.SCHEDULE },
+  { href: "/admin/minutes", label: "Minutes", area: AdminArea.MINUTES },
+  { href: "/admin/moderation", label: "Moderation", area: AdminArea.MODERATION },
   { href: "/admin/users", label: "Users" },
-  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/settings", label: "Settings", area: AdminArea.SETTINGS },
 ];
 
 export default async function AdminLayout({
@@ -18,7 +19,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  const session = await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  const areas = await grantedAreas(session);
+  const nav = NAV.filter((item) => !item.area || areas.includes(item.area));
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -44,7 +47,7 @@ export default async function AdminLayout({
 
       <nav className="overflow-x-auto border-b border-border bg-surface px-4">
         <ul className="flex min-w-max gap-4 text-sm">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireSession, grantedAreas } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 
 export const metadata = { title: "Admin Overview" };
 
@@ -43,6 +45,8 @@ function StatCard({ label, value, href }: { label: string; value: number; href?:
 }
 
 export default async function AdminOverviewPage() {
+  const session = await requireSession();
+  const areas = await grantedAreas(session);
   const stats = await getStats();
 
   return (
@@ -52,13 +56,23 @@ export default async function AdminOverviewPage() {
       </h1>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Invites pending" value={stats.pendingInvites} href="/admin/invites" />
-        <StatCard label="Invites redeemed" value={stats.redeemedInvites} href="/admin/invites" />
-        <StatCard label="Attending" value={stats.attending} href="/admin/rsvps" />
-        <StatCard label="Maybe" value={stats.maybe} href="/admin/rsvps" />
-        <StatCard label="Not attending" value={stats.notAttending} href="/admin/rsvps" />
-        <StatCard label="No response yet" value={stats.noResponse} href="/admin/rsvps" />
-        <StatCard label="Media awaiting review" value={stats.pendingMedia} href="/admin/moderation" />
+        {areas.includes(AdminArea.INVITES) && (
+          <>
+            <StatCard label="Invites pending" value={stats.pendingInvites} href="/admin/invites" />
+            <StatCard label="Invites redeemed" value={stats.redeemedInvites} href="/admin/invites" />
+          </>
+        )}
+        {areas.includes(AdminArea.RSVPS) && (
+          <>
+            <StatCard label="Attending" value={stats.attending} href="/admin/rsvps" />
+            <StatCard label="Maybe" value={stats.maybe} href="/admin/rsvps" />
+            <StatCard label="Not attending" value={stats.notAttending} href="/admin/rsvps" />
+            <StatCard label="No response yet" value={stats.noResponse} href="/admin/rsvps" />
+          </>
+        )}
+        {areas.includes(AdminArea.MODERATION) && (
+          <StatCard label="Media awaiting review" value={stats.pendingMedia} href="/admin/moderation" />
+        )}
       </div>
     </div>
   );

@@ -53,3 +53,37 @@ export const updateUserRoleSchema = z.object({
   userId: z.string().min(1),
   role: z.enum(["PENDING_GUEST", "APPROVED_GUEST", "ADMIN", "SUPERADMIN"]),
 });
+
+export const ADMIN_AREAS = [
+  "INVITES",
+  "SCHEDULE",
+  "SETTINGS",
+  "RSVPS",
+  "MINUTES",
+  "MODERATION",
+] as const;
+
+export const updateUserPermissionsSchema = z.object({
+  userId: z.string().min(1),
+  areas: z.array(z.enum(ADMIN_AREAS)),
+});
+
+export const minutesSchema = z.object({
+  meetingDate: z.string().min(1, "Meeting date is required"),
+  title: z.string().trim().min(2).max(150),
+  venue: z.string().trim().max(200).optional(),
+  attendees: z.string().trim().max(500).optional(),
+});
+
+export const minutesItemSchema = z.object({
+  minutesId: z.string().min(1),
+  text: z.string().trim().min(1).max(500),
+  order: z.coerce.number().int().default(0),
+});
+
+export const pledgeSchema = z.object({
+  minutesId: z.string().min(1),
+  pledgerName: z.string().trim().min(1).max(100),
+  description: z.string().trim().min(1).max(500),
+  order: z.coerce.number().int().default(0),
+});

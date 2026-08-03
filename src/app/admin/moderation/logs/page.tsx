@@ -1,8 +1,12 @@
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 
 export const metadata = { title: "Moderation Log" };
 
 export default async function ModerationLogsPage() {
+  await requireArea(AdminArea.MODERATION);
+
   const logs = await db.moderationLog.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,

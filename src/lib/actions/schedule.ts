@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/enums";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { scheduleItemSchema } from "@/lib/validations/admin";
 import { parseWallClock } from "@/lib/format";
 
@@ -15,7 +15,7 @@ function revalidateScheduleViews() {
 }
 
 export async function saveScheduleItem(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.SCHEDULE);
 
   const id = formData.get("id");
   const parsed = scheduleItemSchema.safeParse({
@@ -49,7 +49,7 @@ export async function saveScheduleItem(formData: FormData) {
 }
 
 export async function deleteScheduleItem(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.SCHEDULE);
 
   const id = formData.get("id");
   if (typeof id !== "string" || !id) throw new Error("Missing schedule item id");

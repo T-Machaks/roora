@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { ModerationActions } from "./moderation-actions";
 
 export const metadata = { title: "Moderation" };
@@ -19,6 +21,8 @@ function MediaPreview({ id, type, caption }: { id: string; type: "IMAGE" | "VIDE
 }
 
 export default async function AdminModerationPage() {
+  await requireArea(AdminArea.MODERATION);
+
   const [pending, recent] = await Promise.all([
     db.media.findMany({
       where: { status: "PENDING" },

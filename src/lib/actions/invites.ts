@@ -2,13 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/enums";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { generateInviteCode, generateInviteToken } from "@/lib/invite";
 import { createInviteSchema } from "@/lib/validations/admin";
 
 export async function createInvite(formData: FormData) {
-  const session = await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  const session = await requireArea(AdminArea.INVITES);
 
   const parsed = createInviteSchema.safeParse({
     guestName: formData.get("guestName") || undefined,
@@ -36,7 +36,7 @@ export async function createInvite(formData: FormData) {
 }
 
 export async function revokeInvite(formData: FormData) {
-  await requireRole([Role.ADMIN, Role.SUPERADMIN]);
+  await requireArea(AdminArea.INVITES);
 
   const id = formData.get("id");
   if (typeof id !== "string" || !id) throw new Error("Missing invite id");

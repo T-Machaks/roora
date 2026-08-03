@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { createInvite, revokeInvite } from "@/lib/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -25,6 +27,8 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function AdminInvitesPage() {
+  await requireArea(AdminArea.INVITES);
+
   const invites = await db.invitation.findMany({
     orderBy: { createdAt: "desc" },
     include: { redeemedBy: { select: { name: true } } },

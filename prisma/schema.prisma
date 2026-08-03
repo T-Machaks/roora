@@ -54,6 +54,18 @@ enum ShareScope {
   ALBUM
 }
 
+// Areas of the admin console an ADMIN can be individually granted access
+// to. SUPERADMIN always has every area implicitly — this table is only
+// ever consulted for ADMIN-role users.
+enum AdminArea {
+  INVITES
+  SCHEDULE
+  SETTINGS
+  RSVPS
+  MINUTES
+  MODERATION
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -74,6 +86,21 @@ model User {
   moderationLogs     ModerationLog[]    @relation("Actor")
   shareLinks         ShareLink[]
   pushSubscriptions  PushSubscription[]
+  permissions        UserPermission[]
+  minutesCreated     Minutes[]          @relation("MinutesCreatedBy")
+}
+
+// Per-user grants of admin console areas, only meaningful for ADMIN-role
+// users (SUPERADMIN bypasses this check entirely — see requireArea).
+model UserPermission {
+  id     String    @id @default(cuid())
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area   AdminArea
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, area])
 }
 
 model Invitation {
@@ -244,4 +271,46 @@ model PushSubscription {
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+}
+
+// Family/elder planning meeting minutes — admin console only, never
+// exposed to the guest site (lobola figures, family matters).
+model Minutes {
+  id          String   @id @default(cuid())
+  meetingDate DateTime
+  title       String
+  venue       String?
+  attendees   String?
+
+  createdById String
+  createdBy   User   @relation("MinutesCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items   MinutesItem[]
+  pledges Pledge[]
+
+  @@index([meetingDate])
+}
+
+model MinutesItem {
+  id        String  @id @default(cuid())
+  minutesId String
+  minutes   Minutes @relation(fields: [minutesId], references: [id], onDelete: Cascade)
+  text      String
+  order     Int     @default(0)
+
+  @@index([minutesId, order])
+}
+
+model Pledge {
+  id          String  @id @default(cuid())
+  minutesId   String
+  minutes     Minutes @relation(fields: [minutesId], references: [id], onDelete: Cascade)
+  pledgerName String
+  description String
+  order       Int     @default(0)
+
+  @@index([minutesId, order])
 }

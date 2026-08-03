@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { requireArea } from "@/lib/auth";
+import { AdminArea } from "@/generated/prisma/enums";
 import { getEventSettings } from "@/lib/settings";
 import { toWallClockInputValue } from "@/lib/format";
 import {
@@ -12,6 +14,8 @@ import { Input, Label } from "@/components/ui/input";
 export const metadata = { title: "Settings" };
 
 export default async function AdminSettingsPage() {
+  await requireArea(AdminArea.SETTINGS);
+
   const [settings, contacts] = await Promise.all([
     getEventSettings(),
     db.contactPerson.findMany({ orderBy: { order: "asc" } }),
