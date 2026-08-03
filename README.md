@@ -74,6 +74,7 @@ See `.env.example` for the full list with inline comments. The important ones:
 | `S3_BUCKET` / `AWS_REGION` | S3 bucket uploaded media is stored in (private — never public); credentials come from the EC2 instance role in production, or the standard AWS SDK credential chain locally |
 | `MAX_UPLOAD_IMAGE_MB` / `MAX_UPLOAD_VIDEO_MB` | Upload size caps |
 | `NEXT_PUBLIC_BASE_URL` | Used to build absolute invite/share links and QR codes |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Sends "forgot password" reset emails via Gmail SMTP — the password is a 16-char app password, not the account login password |
 | `SEED_SUPERADMIN_*` | First superadmin account, created by `npm run seed` |
 | `ENABLE_PUSH` / `NEXT_PUBLIC_ENABLE_PUSH` / `VAPID_*` | Push notification structure (subscription storage only — sending is not implemented) |
 
@@ -195,5 +196,4 @@ The Prisma schema was kept provider-portable from the start. To switch:
 - Push notifications: subscription storage is wired up, but nothing actually sends a push
   yet.
 - No offline caching of gallery media itself (only the app shell/static assets).
-- No self-service password reset — recovery is an admin re-issuing an invite link.
 - No video transcoding/thumbnailing.

@@ -10,15 +10,19 @@ const PUBLIC_EXACT = new Set<string>([
   "/",
   "/login",
   "/redeem",
+  "/forgot-password",
   "/offline",
   "/manifest.webmanifest",
   "/robots.txt",
   "/api/auth/login",
   "/api/invites/redeem",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
 ]);
 
 const PUBLIC_PREFIXES = [
   "/redeem/",
+  "/reset-password/",
   "/share/",
   "/api/share/",
   "/icons/",
