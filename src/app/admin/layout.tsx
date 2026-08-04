@@ -12,6 +12,7 @@ const NAV: { href: string; label: string; area?: AdminArea }[] = [
   { href: "/admin/moderation", label: "Moderation", area: AdminArea.MODERATION },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/settings", label: "Settings", area: AdminArea.SETTINGS },
+  { href: "/admin/faq", label: "FAQ", area: AdminArea.SETTINGS },
 ];
 
 export default async function AdminLayout({

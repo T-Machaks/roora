@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireApiSession } from "@/lib/auth";
-import { rsvpSchema } from "@/lib/validations/rsvp";
+import { rsvpSchema, encodeDietaryNeeds } from "@/lib/validations/rsvp";
 
 export async function POST(request: Request) {
   const session = await requireApiSession();
@@ -16,16 +16,26 @@ export async function POST(request: Request) {
     );
   }
 
-  const { status, guestCount, notes } = parsed.data;
+  const { status, guestCount, notes, songRequest, dietaryOptions, dietaryOther } = parsed.data;
+  const dietaryNeeds = encodeDietaryNeeds(dietaryOptions, dietaryOther);
 
   const rsvp = await db.rsvp.upsert({
     where: { userId: session.userId },
-    update: { status, guestCount, notes, respondedAt: new Date() },
+    update: {
+      status,
+      guestCount,
+      notes,
+      songRequest: songRequest || null,
+      dietaryNeeds,
+      respondedAt: new Date(),
+    },
     create: {
       userId: session.userId,
       status,
       guestCount,
       notes,
+      songRequest: songRequest || null,
+      dietaryNeeds,
       respondedAt: new Date(),
     },
   });

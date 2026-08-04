@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { getEventSettings } from "@/lib/settings";
 import { formatEventDate } from "@/lib/format";
+import { decodeDietaryNeeds } from "@/lib/validations/rsvp";
 import { RsvpForm } from "./rsvp-form";
 
 export const metadata = { title: "RSVP" };
@@ -12,6 +13,7 @@ export default async function RsvpPage() {
     getEventSettings(),
     db.rsvp.findUnique({ where: { userId: session.userId } }),
   ]);
+  const dietary = decodeDietaryNeeds(rsvp?.dietaryNeeds ?? null);
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
@@ -32,6 +34,11 @@ export default async function RsvpPage() {
         initialStatus={rsvp?.status === "NO_RESPONSE" || !rsvp ? "ATTENDING" : rsvp.status}
         initialGuestCount={rsvp?.guestCount ?? 1}
         initialNotes={rsvp?.notes ?? ""}
+        initialSongRequest={rsvp?.songRequest ?? ""}
+        initialDietaryOptions={
+          dietary.other ? [...dietary.options, "Other"] : dietary.options
+        }
+        initialDietaryOther={dietary.other ?? ""}
       />
     </div>
   );

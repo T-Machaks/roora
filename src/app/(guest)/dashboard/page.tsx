@@ -9,6 +9,8 @@ import {
   GalleryIcon,
   DressCodeIcon,
   ContactIcon,
+  VenueIcon,
+  FaqIcon,
 } from "@/components/icons";
 
 export const metadata = { title: "Home" };
@@ -74,6 +76,18 @@ export default async function DashboardPage() {
           icon={<DressCodeIcon />}
           label="Dress Code"
           sublabel="All black"
+        />
+        <Tile
+          href="/venue"
+          icon={<VenueIcon />}
+          label="Venue"
+          sublabel="Map & directions"
+        />
+        <Tile
+          href="/faq"
+          icon={<FaqIcon />}
+          label="FAQ"
+          sublabel="Common questions"
         />
         <Tile
           href="/contact"

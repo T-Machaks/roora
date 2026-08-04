@@ -144,10 +144,12 @@ model Rsvp {
   id          String     @id @default(cuid())
   userId      String     @unique
   user        User       @relation(fields: [userId], references: [id])
-  status      RsvpStatus @default(NO_RESPONSE)
-  guestCount  Int        @default(1)
-  notes       String?
-  respondedAt DateTime?
+  status       RsvpStatus @default(NO_RESPONSE)
+  guestCount   Int        @default(1)
+  notes        String?
+  songRequest  String?
+  dietaryNeeds String? // JSON: { options: string[], other: string | null }
+  respondedAt  DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -178,12 +180,18 @@ model EventSettings {
   mainVenueIsTBA   Boolean   @default(true)
   mainStartTime    DateTime?
   mainEndTime      DateTime?
+  mainVenueMapUrl  String?
+  mainVenueLat     Float?
+  mainVenueLng     Float?
 
   afterVenueName    String?
   afterVenueAddress String?
   afterVenueIsTBA   Boolean   @default(true)
   afterStartTime    DateTime?
   afterEndTime      DateTime?
+  afterVenueMapUrl  String?
+  afterVenueLat     Float?
+  afterVenueLng     Float?
 
   dressCode String
 
@@ -193,6 +201,16 @@ model EventSettings {
 
   rsvpDeadline DateTime?
 
+  updatedAt DateTime @updatedAt
+}
+
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 

@@ -101,6 +101,35 @@ export default async function AdminSettingsPage() {
                   defaultValue={settings.mainEndTime ? toWallClockInputValue(settings.mainEndTime) : ""}
                 />
               </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="mainVenueMapUrl">Google Maps embed URL (optional)</Label>
+                <Input
+                  id="mainVenueMapUrl"
+                  name="mainVenueMapUrl"
+                  placeholder="https://www.google.com/maps/embed?..."
+                  defaultValue={settings.mainVenueMapUrl ?? ""}
+                />
+              </div>
+              <div>
+                <Label htmlFor="mainVenueLat">Latitude (optional)</Label>
+                <Input
+                  id="mainVenueLat"
+                  name="mainVenueLat"
+                  type="number"
+                  step="any"
+                  defaultValue={settings.mainVenueLat ?? ""}
+                />
+              </div>
+              <div>
+                <Label htmlFor="mainVenueLng">Longitude (optional)</Label>
+                <Input
+                  id="mainVenueLng"
+                  name="mainVenueLng"
+                  type="number"
+                  step="any"
+                  defaultValue={settings.mainVenueLng ?? ""}
+                />
+              </div>
             </div>
           </fieldset>
 
@@ -141,6 +170,35 @@ export default async function AdminSettingsPage() {
                   name="afterEndTime"
                   type="datetime-local"
                   defaultValue={settings.afterEndTime ? toWallClockInputValue(settings.afterEndTime) : ""}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="afterVenueMapUrl">Google Maps embed URL (optional)</Label>
+                <Input
+                  id="afterVenueMapUrl"
+                  name="afterVenueMapUrl"
+                  placeholder="https://www.google.com/maps/embed?..."
+                  defaultValue={settings.afterVenueMapUrl ?? ""}
+                />
+              </div>
+              <div>
+                <Label htmlFor="afterVenueLat">Latitude (optional)</Label>
+                <Input
+                  id="afterVenueLat"
+                  name="afterVenueLat"
+                  type="number"
+                  step="any"
+                  defaultValue={settings.afterVenueLat ?? ""}
+                />
+              </div>
+              <div>
+                <Label htmlFor="afterVenueLng">Longitude (optional)</Label>
+                <Input
+                  id="afterVenueLng"
+                  name="afterVenueLng"
+                  type="number"
+                  step="any"
+                  defaultValue={settings.afterVenueLng ?? ""}
                 />
               </div>
             </div>

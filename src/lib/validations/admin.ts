@@ -29,12 +29,18 @@ export const eventSettingsSchema = z.object({
   mainVenueAddress: z.string().trim().max(300).optional(),
   mainStartTime: z.string().optional(),
   mainEndTime: z.string().optional(),
+  mainVenueMapUrl: z.union([z.url(), z.literal("")]).optional(),
+  mainVenueLat: z.coerce.number().min(-90).max(90).optional(),
+  mainVenueLng: z.coerce.number().min(-180).max(180).optional(),
 
   afterVenueIsTBA: z.coerce.boolean(),
   afterVenueName: z.string().trim().max(150).optional(),
   afterVenueAddress: z.string().trim().max(300).optional(),
   afterStartTime: z.string().optional(),
   afterEndTime: z.string().optional(),
+  afterVenueMapUrl: z.union([z.url(), z.literal("")]).optional(),
+  afterVenueLat: z.coerce.number().min(-90).max(90).optional(),
+  afterVenueLng: z.coerce.number().min(-180).max(180).optional(),
 
   dressCode: z.string().trim().min(1).max(1000),
   themePrimaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
@@ -79,6 +85,13 @@ export const minutesItemSchema = z.object({
   minutesId: z.string().min(1),
   text: z.string().trim().min(1).max(500),
   order: z.coerce.number().int().default(0),
+});
+
+export const faqItemSchema = z.object({
+  question: z.string().trim().min(2).max(300),
+  answer: z.string().trim().min(1).max(2000),
+  order: z.coerce.number().int().default(0),
+  visible: z.coerce.boolean(),
 });
 
 export const pledgeSchema = z.object({
