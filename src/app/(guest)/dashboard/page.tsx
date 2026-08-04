@@ -1,5 +1,6 @@
 import { getEventSettings } from "@/lib/settings";
 import { formatEventDate, daysUntil } from "@/lib/format";
+import { Countdown } from "@/components/countdown";
 import { Tile } from "@/components/ui/tile";
 import {
   ProgramIcon,
@@ -43,6 +44,9 @@ export default async function DashboardPage() {
             It&rsquo;s today!
           </p>
         )}
+        <div className="mt-4">
+          <Countdown eventDate={settings.eventDate} />
+        </div>
       </section>
 
       <section className="grid grid-cols-2 gap-3">
