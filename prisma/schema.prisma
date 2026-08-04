@@ -203,6 +203,12 @@ model EventSettings {
   rsvpReminder3dSentAt DateTime?
   rsvpReminder1dSentAt DateTime?
 
+  // Live event-day banner (e.g. "Ceremony starting in 5 minutes") — polled
+  // by guest devices, cleared by an admin or auto-hidden client-side once
+  // stale. Not a push notification; see PushSubscription for that.
+  liveAnnouncement   String?
+  liveAnnouncementAt DateTime?
+
   updatedAt DateTime @updatedAt
 }
 

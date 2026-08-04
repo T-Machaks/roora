@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth";
 import { Role } from "@/generated/prisma/enums";
 import { AccountIcon, LogoutIcon } from "@/components/icons";
 import { InstallPrompt } from "@/components/install-prompt";
+import { LiveAnnouncementBanner } from "@/components/live-announcement-banner";
 import { BottomNav } from "./bottom-nav";
 
 export default async function GuestLayout({
@@ -51,6 +52,8 @@ export default async function GuestLayout({
           </form>
         </div>
       </header>
+
+      <LiveAnnouncementBanner />
 
       <main className="flex-1 px-4 pb-24 pt-4">{children}</main>
 

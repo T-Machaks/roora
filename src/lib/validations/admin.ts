@@ -87,6 +87,10 @@ export const minutesItemSchema = z.object({
   order: z.coerce.number().int().default(0),
 });
 
+export const liveAnnouncementSchema = z.object({
+  text: z.string().trim().min(1).max(200),
+});
+
 export const announcementSchema = z.object({
   title: z.string().trim().min(1).max(100),
   body: z.string().trim().min(1).max(500),

@@ -9,6 +9,7 @@ import {
   deleteContact,
 } from "@/lib/actions/settings";
 import { sendAnnouncement } from "@/lib/actions/announcements";
+import { postLiveAnnouncement, clearLiveAnnouncement } from "@/lib/actions/live";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 
@@ -273,6 +274,31 @@ export default async function AdminSettingsPage() {
           <Input name="email" type="email" placeholder="Email (optional)" />
           <Button type="submit" className="sm:col-span-2">
             Add contact
+          </Button>
+        </form>
+      </section>
+
+      <section>
+        <h2 className="font-display text-xl text-primary">Live banner</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Shows as a banner at the top of every screen for guests currently in the app
+          (e.g. &ldquo;Ceremony starting in 5 minutes&rdquo;) — not a push notification, and
+          auto-hides after 3 hours if left up.
+        </p>
+        {settings.liveAnnouncement && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary bg-secondary/40 p-4">
+            <p className="text-sm text-ink">Currently live: {settings.liveAnnouncement}</p>
+            <form action={clearLiveAnnouncement}>
+              <button type="submit" className="shrink-0 text-xs text-red-700 underline">
+                Clear now
+              </button>
+            </form>
+          </div>
+        )}
+        <form action={postLiveAnnouncement} className="mt-4 flex max-w-lg flex-col gap-3 sm:flex-row">
+          <Input name="text" placeholder="e.g. Ceremony starting in 5 minutes" maxLength={200} required className="flex-1" />
+          <Button type="submit" variant="outline">
+            Post
           </Button>
         </form>
       </section>

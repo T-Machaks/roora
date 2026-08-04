@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { GalleryGridItem } from "@/components/gallery-grid-item";
-import { PlayIcon } from "@/components/icons";
+import { MediaThumb } from "@/components/media-thumb";
+import { LiveApprovedGrid } from "@/components/live-approved-grid";
 import { UploadForm } from "./upload-form";
 
 export const metadata = { title: "Gallery" };
@@ -13,31 +14,6 @@ const STATUS_LABEL: Record<string, string> = {
   HIDDEN: "Hidden by hosts",
 };
 
-function Thumb({ id, type }: { id: string; type: "IMAGE" | "VIDEO" }) {
-  const src = `/api/media/file/${id}`;
-  if (type === "IMAGE") {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" />;
-  }
-  return (
-    <div className="relative h-full w-full">
-      {/* No server-side thumbnail extraction (no ffmpeg in the image) —
-          the #t= fragment is a browser-only seek hint, never sent to the
-          server, so this relies purely on Range support in streamFile. */}
-      <video
-        src={`${src}#t=0.1`}
-        preload="metadata"
-        muted
-        playsInline
-        className="h-full w-full object-cover"
-      />
-      <span className="absolute inset-0 flex items-center justify-center bg-black/20">
-        <PlayIcon width={28} height={28} className="text-white drop-shadow" />
-      </span>
-    </div>
-  );
-}
-
 export default async function GalleryPage() {
   const session = await requireSession();
 
@@ -46,6 +22,7 @@ export default async function GalleryPage() {
       where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
       take: 60,
+      select: { id: true, type: true, createdAt: true },
     }),
     db.media.findMany({
       where: { uploaderId: session.userId, status: { not: "APPROVED" } },
@@ -105,7 +82,7 @@ export default async function GalleryPage() {
                 className="flex flex-col gap-1"
               >
                 <div className="aspect-square overflow-hidden rounded-lg border border-border">
-                  <Thumb id={m.id} type={m.type} />
+                  <MediaThumb id={m.id} type={m.type} />
                 </div>
                 <p className="text-[10px] text-ink-muted">{STATUS_LABEL[m.status]}</p>
               </GalleryGridItem>
@@ -118,24 +95,13 @@ export default async function GalleryPage() {
         <h2 className="text-sm font-medium uppercase tracking-wide text-ink-muted">
           Approved memories
         </h2>
-        {approved.length === 0 ? (
-          <p className="text-sm text-ink-muted">
-            No memories have been shared yet — be the first!
-          </p>
-        ) : (
-          <div className="grid grid-cols-3 gap-2">
-            {approved.map((m, i) => (
-              <GalleryGridItem
-                key={m.id}
-                href={`/gallery/${m.id}`}
-                index={i}
-                className="aspect-square overflow-hidden rounded-lg border border-border block"
-              >
-                <Thumb id={m.id} type={m.type} />
-              </GalleryGridItem>
-            ))}
-          </div>
-        )}
+        <LiveApprovedGrid
+          initialItems={approved.map((m) => ({
+            id: m.id,
+            type: m.type,
+            createdAt: m.createdAt.toISOString(),
+          }))}
+        />
       </section>
     </div>
   );
