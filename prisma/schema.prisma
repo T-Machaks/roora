@@ -200,8 +200,19 @@ model EventSettings {
   themeName           String @default("groom")
 
   rsvpDeadline DateTime?
+  rsvpReminder3dSentAt DateTime?
+  rsvpReminder1dSentAt DateTime?
 
   updatedAt DateTime @updatedAt
+}
+
+model FeaturedPhoto {
+  id        String   @id @default(cuid())
+  path      String // S3 key
+  mimeType  String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model FaqItem {

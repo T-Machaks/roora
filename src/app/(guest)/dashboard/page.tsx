@@ -1,6 +1,7 @@
 import { getEventSettings } from "@/lib/settings";
 import { formatEventDate, daysUntil } from "@/lib/format";
 import { Countdown } from "@/components/countdown";
+import { Reveal } from "@/components/reveal";
 import { Tile } from "@/components/ui/tile";
 import {
   ProgramIcon,
@@ -21,37 +22,39 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
-      <section className="rounded-2xl border border-border bg-surface p-6 text-center">
-        <p className="font-display text-sm uppercase tracking-[0.3em] text-ink-muted">
-          Maroora Celebration
-        </p>
-        <h1 className="font-display mt-2 text-2xl font-semibold text-primary">
-          {settings.groomName} &amp; {settings.brideName}
-        </h1>
-        <p className="mt-2 text-sm text-ink-muted">
-          {formatEventDate(settings.eventDate)}
-        </p>
-        <p className="mt-1 text-sm text-ink-muted">
-          {settings.mainVenueIsTBA
-            ? "Venue to be advised"
-            : settings.mainVenueName}
-        </p>
-        {days > 0 && (
-          <p className="mt-4 inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-primary-dark">
-            {days} {days === 1 ? "day" : "days"} to go
+      <Reveal>
+        <section className="rounded-2xl border border-border bg-surface p-6 text-center">
+          <p className="font-display text-sm uppercase tracking-[0.3em] text-ink-muted">
+            Maroora Celebration
           </p>
-        )}
-        {days === 0 && (
-          <p className="mt-4 inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-primary-dark">
-            It&rsquo;s today!
+          <h1 className="font-display mt-2 text-2xl font-semibold text-primary">
+            {settings.groomName} &amp; {settings.brideName}
+          </h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            {formatEventDate(settings.eventDate)}
           </p>
-        )}
-        <div className="mt-4">
-          <Countdown eventDate={settings.eventDate} />
-        </div>
-      </section>
+          <p className="mt-1 text-sm text-ink-muted">
+            {settings.mainVenueIsTBA
+              ? "Venue to be advised"
+              : settings.mainVenueName}
+          </p>
+          {days > 0 && (
+            <p className="mt-4 inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-primary-dark">
+              {days} {days === 1 ? "day" : "days"} to go
+            </p>
+          )}
+          {days === 0 && (
+            <p className="mt-4 inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-primary-dark">
+              It&rsquo;s today!
+            </p>
+          )}
+          <div className="mt-4">
+            <Countdown eventDate={settings.eventDate} />
+          </div>
+        </section>
+      </Reveal>
 
-      <section className="grid grid-cols-2 gap-3">
+      <Reveal delay={0.1} className="grid grid-cols-2 gap-3">
         <Tile
           href="/program"
           icon={<ProgramIcon />}
@@ -95,7 +98,7 @@ export default async function DashboardPage() {
           label="Contact"
           sublabel="Reach the hosts"
         />
-      </section>
+      </Reveal>
     </div>
   );
 }

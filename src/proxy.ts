@@ -18,6 +18,7 @@ const PUBLIC_EXACT = new Set<string>([
   "/api/invites/redeem",
   "/api/auth/forgot-password",
   "/api/auth/reset-password",
+  "/api/cron/rsvp-reminder",
 ]);
 
 const PUBLIC_PREFIXES = [

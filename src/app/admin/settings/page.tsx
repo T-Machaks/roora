@@ -8,6 +8,7 @@ import {
   createContact,
   deleteContact,
 } from "@/lib/actions/settings";
+import { sendAnnouncement } from "@/lib/actions/announcements";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 
@@ -272,6 +273,28 @@ export default async function AdminSettingsPage() {
           <Input name="email" type="email" placeholder="Email (optional)" />
           <Button type="submit" className="sm:col-span-2">
             Add contact
+          </Button>
+        </form>
+      </section>
+
+      <section>
+        <h2 className="font-display text-xl text-primary">Send announcement</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Sends a push notification immediately to every guest who has enabled
+          notifications.
+        </p>
+        <form action={sendAnnouncement} className="mt-4 flex max-w-lg flex-col gap-3">
+          <Input name="title" placeholder="Title (e.g. Venue announced!)" maxLength={100} required />
+          <textarea
+            name="body"
+            placeholder="Message"
+            rows={3}
+            maxLength={500}
+            required
+            className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+          <Button type="submit" variant="outline" className="self-start">
+            Send to all guests
           </Button>
         </form>
       </section>

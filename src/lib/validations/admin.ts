@@ -87,6 +87,11 @@ export const minutesItemSchema = z.object({
   order: z.coerce.number().int().default(0),
 });
 
+export const announcementSchema = z.object({
+  title: z.string().trim().min(1).max(100),
+  body: z.string().trim().min(1).max(500),
+});
+
 export const faqItemSchema = z.object({
   question: z.string().trim().min(2).max(300),
   answer: z.string().trim().min(1).max(2000),

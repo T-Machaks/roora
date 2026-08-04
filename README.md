@@ -76,7 +76,8 @@ See `.env.example` for the full list with inline comments. The important ones:
 | `NEXT_PUBLIC_BASE_URL` | Used to build absolute invite/share links and QR codes |
 | `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Sends "forgot password" reset emails via Gmail SMTP — the password is a 16-char app password, not the account login password |
 | `SEED_SUPERADMIN_*` | First superadmin account, created by `npm run seed` |
-| `ENABLE_PUSH` / `NEXT_PUBLIC_ENABLE_PUSH` / `VAPID_*` | Push notification structure (subscription storage only — sending is not implemented) |
+| `ENABLE_PUSH` / `NEXT_PUBLIC_ENABLE_PUSH` / `VAPID_*` | Push notification sending — off unless `ENABLE_PUSH=true` |
+| `CRON_SECRET` | Bearer secret for `POST /api/cron/rsvp-reminder`, called by a daily host crontab entry |
 
 `EVENT_DATE` / `THEME_PRIMARY_COLOR` / `THEME_SECONDARY_COLOR` are **bootstrap defaults
 only**, used the first time `npm run seed` runs. After that, the database is the source of
@@ -191,9 +192,29 @@ The Prisma schema was kept provider-portable from the start. To switch:
 - `/api/auth/login` and `/api/invites/redeem` are rate-limited (10 requests per IP per
   window; see the reverse-proxy note above).
 
+## Push notifications
+
+With `ENABLE_PUSH=true` and a VAPID keypair set (`npm run vapid:generate`), guests who tap
+"Enable notifications" on `/account` can be pushed:
+
+- **Admin-triggered**: "Send announcement" at the bottom of `/admin/settings` — a title +
+  body sent immediately to every subscribed device.
+- **RSVP deadline reminders**: automatic, 3 days and 1 day before `rsvpDeadline`. This needs
+  a daily trigger from outside the app (there's no in-process scheduler) — add a host
+  crontab entry:
+
+  ```cron
+  0 9 * * * curl -s -X POST -H "Authorization: Bearer $CRON_SECRET" https://your-domain/api/cron/rsvp-reminder
+  ```
+
+  The route is idempotent per milestone (tracked on `EventSettings`), so calling it more
+  than once a day is harmless. Changing `rsvpDeadline` resets both "already sent" flags.
+
+Expired/uninstalled subscriptions (the push service returns 404/410) are pruned automatically
+as they're hit.
+
 ## Known limitations (explicitly deferred)
 
-- Push notifications: subscription storage is wired up, but nothing actually sends a push
-  yet.
 - No offline caching of gallery media itself (only the app shell/static assets).
-- No video transcoding/thumbnailing.
+- No video transcoding/thumbnailing — see the "video thumbnails" note in the gallery, which
+  uses the browser's own `#t=1` scrub instead of a server-generated poster frame.

@@ -10,6 +10,7 @@ const NAV: { href: string; label: string; area?: AdminArea }[] = [
   { href: "/admin/schedule", label: "Schedule", area: AdminArea.SCHEDULE },
   { href: "/admin/minutes", label: "Minutes", area: AdminArea.MINUTES },
   { href: "/admin/moderation", label: "Moderation", area: AdminArea.MODERATION },
+  { href: "/admin/gallery-featured", label: "Featured Gallery", area: AdminArea.MODERATION },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/settings", label: "Settings", area: AdminArea.SETTINGS },
   { href: "/admin/faq", label: "FAQ", area: AdminArea.SETTINGS },

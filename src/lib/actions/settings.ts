@@ -53,6 +53,10 @@ export async function updateEventSettings(formData: FormData) {
   }
   const d = parsed.data;
 
+  const current = await db.eventSettings.findUniqueOrThrow({ where: { id: "default" } });
+  const newDeadline = d.rsvpDeadline ? new Date(d.rsvpDeadline) : null;
+  const deadlineChanged = current.rsvpDeadline?.getTime() !== newDeadline?.getTime();
+
   await db.eventSettings.update({
     where: { id: "default" },
     data: {
@@ -78,7 +82,13 @@ export async function updateEventSettings(formData: FormData) {
       dressCode: d.dressCode,
       themePrimaryColor: d.themePrimaryColor,
       themeSecondaryColor: d.themeSecondaryColor,
-      rsvpDeadline: d.rsvpDeadline ? new Date(d.rsvpDeadline) : null,
+      rsvpDeadline: newDeadline,
+      // A changed deadline invalidates any reminder already sent against
+      // the old date, so the new date gets its own 3-day/1-day reminders.
+      ...(deadlineChanged && {
+        rsvpReminder3dSentAt: null,
+        rsvpReminder1dSentAt: null,
+      }),
     },
   });
 
